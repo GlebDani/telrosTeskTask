@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+  postgres:
+    environment:
+      POSTGRES_USER: terlos
+      POSTGRES_PASSWORD: terlos
+      POSTGRES_DB: terlos_bd
+    ports:
+      - "5432:5432"
+#    volumes:
+#      - .:/docker-entrypoint-initdb.d
+    image: postgres:16
