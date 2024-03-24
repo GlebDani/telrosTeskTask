@@ -15,20 +15,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserRepository userRepository;
 
-    private AuthInfoService authInfoService;
 
-    public UserDetailsServiceImpl(UserRepository userRepository, AuthInfoService authInfoService) {
+
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.authInfoService = authInfoService;
+
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println(username);
          Optional<User> user = userRepository.findByEmail(username);
          if(user.isEmpty())
              throw new UsernameNotFoundException("Нет пользователя с таким email");
-        System.out.println(user.get());
-         return new UserDetailsImp(user.get(), authInfoService);
+         return new UserDetailsImp(user.get());
     }
 }

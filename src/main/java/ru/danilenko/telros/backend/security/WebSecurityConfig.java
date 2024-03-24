@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.danilenko.telros.backend.security.util.MySimpleUrlAuthenticationSuccessHandler;
-import ru.danilenko.telros.backend.service.security.AuthInfoService;
 import ru.danilenko.telros.backend.service.security.UserDetailsServiceImpl;
 import ru.danilenko.telros.ui.LoginView;
 
@@ -23,10 +22,10 @@ import ru.danilenko.telros.ui.LoginView;
 public class WebSecurityConfig  extends VaadinWebSecurity {
 
     private UserDetailsService userDetailsService;
-    private AuthInfoService authInfoService;
 
-
-    
+    /**
+     * white list
+     */
     private final String[] WHITELIST = new String[]{
             "/icons/**",
             "/images/**",
@@ -34,11 +33,15 @@ public class WebSecurityConfig  extends VaadinWebSecurity {
             "/frontend/**"
     };
 
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthInfoService authInfoService) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
-        this.authInfoService = authInfoService;
     }
 
+    /**
+     * configuretion
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         setLoginView(http, LoginView.class);
@@ -52,14 +55,12 @@ public class WebSecurityConfig  extends VaadinWebSecurity {
 
         ;
         super.configure(http);
-
-
-
     }
 
-
-
-
+    /**
+     * Custom the authentication
+     * @return
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -71,15 +72,23 @@ public class WebSecurityConfig  extends VaadinWebSecurity {
     public UserDetailsService userDetailsService(){
         return userDetailsService;
     }
+
+    /**
+     * create bean of password encored
+     * @return
+     */
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * create bean of custom AuthenticationSuccessHandler
+     * @return
+     */
     @Bean
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
-
-        return new MySimpleUrlAuthenticationSuccessHandler(authInfoService);
+        return new MySimpleUrlAuthenticationSuccessHandler();
     }
 
 

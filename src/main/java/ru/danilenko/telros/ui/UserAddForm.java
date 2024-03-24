@@ -18,16 +18,36 @@ import ru.danilenko.telros.backend.entity.User;
 import ru.danilenko.telros.backend.service.UserService;
 import ru.danilenko.telros.ui.form.UserForm;
 
+/**
+ * Add new user page view
+ */
 @Route("/add")
 @RolesAllowed("ROLE_ADMIN")
 public class UserAddForm extends VerticalLayout {
-    private final UserForm userForm;
+    /**
+     * User form to display {@link UserForm}
+     */
+    protected UserForm userForm;
+    /**
+     * User service to save user {@link UserService}
+     */
     private UserService userService;
 
-
-    private PasswordField password = new PasswordField("Пароль");
-    private PasswordField password2 = new PasswordField("Повторите пароль");
+    /**
+     * Password field to enter password
+     */
+    protected PasswordField password = new PasswordField("Пароль");
+    /**
+     * Password field to repeat password
+     */
+    protected PasswordField password2 = new PasswordField("Повторите пароль");
+    /**
+     * button to save new user
+     */
     Button save = new Button("Сохранить");
+    /**
+     * button to leave this page to {@link AdminPage}
+     */
     Button close = new Button("Назад", buttonClickEvent ->  UI.getCurrent().getPage().setLocation("/admin"));
     public  UserAddForm(UserService userService){
         this.userService = userService;
@@ -39,23 +59,27 @@ public class UserAddForm extends VerticalLayout {
         );
     }
 
+    /**
+     * adding to password fields and button to form from {@link UserForm}
+     */
     private void configureForm() {
-
         userForm.add(
                 new HorizontalLayout(password,password2),
                 createButton()
-
         );
-//        userForm.addStatus(save);
-
     }
+
+    /**
+     * save user method
+     * local binder checks if passwords are identical and not blank
+     * allow to save user if both binder are valid
+     */
     private void saveUser(){
         Binder<User> binder = new Binder<>();
         binder.forField(password).withValidator(y -> y.equals(password2.getValue()),"Пароли не совпадают")
                 .withValidator(y->!y.isBlank(),"Пароль не должен быть пустым")
                 .bind(User::getPassword,User::setPassword);
         binder.validate().notifyBindingValidationStatusHandlers();
-        System.out.println("su" + binder.isValid() );
         if(userForm.validateToAdd() && binder.isValid() ) {
             User user = userForm.getUser();
             user.setPassword(password.getValue());
@@ -63,22 +87,24 @@ public class UserAddForm extends VerticalLayout {
             Notification.show("User added");
             UI.getCurrent().getPage().setLocation("/users");
         }
-
     }
+    /**
+     * method refresh form
+     */
     private  void  close(){
         userForm.setUser(null);
     }
 
+    /**
+     * method creates 2 buttons to save user and leave the page
+     * @return Component of 2 buttons
+     */
     private Component createButton(){
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         save.addClickShortcut(Key.ENTER);
-
         save.addClickListener(click -> saveUser());
         close.addClickListener(click-> close());
-
-
-
         return new HorizontalLayout(save, close);
     }
 }

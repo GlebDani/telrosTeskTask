@@ -21,20 +21,22 @@ public class UserForm extends VerticalLayout {
     private Binder<User> binder ;
     private  UserService userService;
 
+    /**
+     * email binder to check if exist in db
+     */
     Binder<User> binderEmail = new Binder<>();
 
-
-    private EmailField email= new EmailField("Email");
-    private PasswordField password = new PasswordField("Пароль");
-    private TextField surname = new TextField("Фамилия");
-    private TextField name = new TextField("Имя");
-    private TextField fatherName = new TextField("Отчество");
-
-    private DatePicker dateOfBirth = new DatePicker("Дата рождения");
-    private TextField phoneNumber = new TextField("Номер телефона");
-    private ComboBox<Roles> role = new ComboBox<>("Роль");
-//    private Avatar avatarField = new Avatar("Image");
-
+    /**
+     * User field to bind
+     */
+    protected EmailField email= new EmailField("Email");
+    protected PasswordField password = new PasswordField("Пароль");
+    protected TextField surname = new TextField("Фамилия");
+    protected TextField name = new TextField("Имя");
+    protected TextField fatherName = new TextField("Отчество");
+    protected DatePicker dateOfBirth = new DatePicker("Дата рождения");
+    protected TextField phoneNumber = new TextField("Номер телефона");
+    protected ComboBox<Roles> role = new ComboBox<>("Роль");
 
     public UserForm(  UserService userService){
         binder = new BeanValidationBinder<>(User.class);
@@ -44,7 +46,6 @@ public class UserForm extends VerticalLayout {
 
         role.setItems(Roles.values());
         add(
-//                avatarField,
                 email,
                 new HorizontalLayout(surname,
                         name),
@@ -52,12 +53,17 @@ public class UserForm extends VerticalLayout {
                         dateOfBirth),
                 new HorizontalLayout(phoneNumber,
                         role)
-
-
         );
         setUser(new User());
     }
 
+    /**
+     * check if user's to update email is the same as it was before.
+     * if emails coincide then we validate other fields
+     * if emails are different we first check if new email is possible to save
+     * @param email1 initial email of user
+     * @return true if possible to save
+     */
     public boolean validateToUpdate(String email1) {
         boolean sameEmail = true;
         if(!email1.equals(getUser().getEmail())) {
@@ -67,24 +73,34 @@ public class UserForm extends VerticalLayout {
         binder.validate().getBeanValidationResults();
         return binder.isValid() && (sameEmail);
     }
-
+    /**
+     * check if user's to SAVE IS VALID.
+     */
     public boolean validateToAdd() {
         binder.validate().getBeanValidationResults();
         binderEmail.validate().getBeanValidationResults();
-        System.out.println("vta1"+ (binder.isValid()));
-        System.out.println("vta2"+ (binderEmail.isValid()));
         return binder.isValid() && binderEmail.isValid();
     }
 
-
+    /**
+     * set user to form
+     * @param user user
+     */
     public void setUser(User user)  {
         binder.setBean(user);
-
     }
 
+    /**
+     * get user from Form
+     * @return User
+     */
     public User getUser(){
         return binder.getBean();
     }
+
+    /**
+     * set read only mode
+     */
     public void disable(){
         binder.setReadOnly(true);
     }

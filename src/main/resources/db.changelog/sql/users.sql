@@ -7,10 +7,5 @@ create table users(
     father_name   varchar,
     date_of_birth date,
     phone_number  varchar,
-    photo_path    varchar,
     role          varchar not null
-);
-create  table auth_info(
-    user_id int primary key references users(id) on delete cascade,
-    auth_time timestamp
 );

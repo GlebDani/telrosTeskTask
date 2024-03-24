@@ -10,17 +10,31 @@ import ru.danilenko.telros.backend.security.LogoutConfig;
 import ru.danilenko.telros.backend.service.UserService;
 import ru.danilenko.telros.ui.form.UserForm;
 
+/**
+ * User page view
+ */
 @Route("/user")
 @RolesAllowed("ROLE_USER")
 public class UserPage extends VerticalLayout {
 
-
+    /**
+     * User form to display {@link UserForm}
+     */
     private UserForm form;
+    /**
+     * User service to load user info {@link UserService}
+     */
     private UserService userService;
 
+    /**
+     * configuration to logout {@link LogoutConfig}
+     */
     private LogoutConfig logoutConfig;
 
-    private Button logout = new Button("Выйти", buttonClickEvent -> logoutConfig.logout());
+    /**
+     * button to log out
+     */
+    protected Button logout = new Button("Выйти", buttonClickEvent -> logoutConfig.logout());
 
     public UserPage(UserService userService1, LogoutConfig logoutConfig) {
         this.userService = userService1;

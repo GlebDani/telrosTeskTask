@@ -18,11 +18,19 @@ import ru.danilenko.telros.backend.entity.User;
 import ru.danilenko.telros.backend.service.UserService;
 import ru.danilenko.telros.ui.form.UserForm;
 
+/**
+ * Page with list of users with possibility of changing
+ */
 @Route("/users")
 @RolesAllowed("ROLE_ADMIN")
 public class UsersList extends VerticalLayout {
-
+    /**
+     * creating a grid based on User class {@link User}
+     */
     private Grid<User> grid = new Grid<>(User.class);
+    /**
+     * need to read initial user email
+     */
     private String email;
     private UserForm form;
     private UserService userService;
@@ -59,10 +67,16 @@ public class UsersList extends VerticalLayout {
 
     }
 
+    /**
+     * set all users, obtained from user service {@link UserService} to grid
+     */
     private void updateList() {
         grid.setItems(userService.findAll());
     }
 
+    /**
+     * close the form with user data
+     */
     private void closeEditor() {
         if(form.getUser()!=null){
             grid.deselect(form.getUser());
@@ -72,6 +86,10 @@ public class UsersList extends VerticalLayout {
         removeClassName("editing");
     }
 
+    /**
+     * configuration of form based on {@link UserForm}
+     * adding buttons to it
+     */
     private void configureForm() {
         form = new UserForm(userService);
         form.setWidth("40em");
@@ -80,6 +98,10 @@ public class UsersList extends VerticalLayout {
         );
     }
 
+    /**
+     * configure grid with the exhibited fields of user
+     * add select listener
+     */
     private void configureGrid() {
         grid.setClassName("users-grid");
         grid.setColumns("email","surname","name","role");
@@ -89,6 +111,10 @@ public class UsersList extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(event -> editUser(event.getValue()));
     }
 
+    /**
+     * set a selected from grid user to form
+     * @param value User
+     */
     private void editUser(User value) {
         if(value == null)
             closeEditor();
@@ -100,7 +126,10 @@ public class UsersList extends VerticalLayout {
         }
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    /**
+     * create buttons
+     * @return Component of buttons
+     */
     private Component createButton(){
         update.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -113,6 +142,11 @@ public class UsersList extends VerticalLayout {
         return new VerticalLayout(new HorizontalLayout(update,delete, close), change);
     }
 
+    /**
+     * method to update password
+     * inner binder check the password identity
+     * if binder.ifValid then set password to user and call update password
+     */
     private void updatePassword() {
         Binder<User> binder = new Binder<>();
         binder.forField(password).withValidator(y -> y.equals(password2.getValue()),"Пароли не совпадают")
@@ -129,7 +163,9 @@ public class UsersList extends VerticalLayout {
         }
     }
 
-
+    /**
+     * creating a popuped dialog window to change password
+     */
     private void formPassword() {
         VerticalLayout popupContent = new VerticalLayout();
         popupContent.add(new HorizontalLayout(password,password2));
@@ -138,15 +174,19 @@ public class UsersList extends VerticalLayout {
         dialog.getFooter().add(new Button("Обновить",event -> updatePassword()));
     }
 
+    /**
+     * pass initial email of user as "email"
+     */
     private void updateUser(){
-        System.out.println(form.getUser().getEmail());
-        System.out.println("email" + email);
         if(form.validateToUpdate(email)) {
-            System.out.println(form.getUser());
             userService.update(form.getUser());
             Notification.show("Пользователь обновлев");
         }
     }
+
+    /**
+     * deletes user
+     */
     private  void  delete(){
         userService.delete(form.getUser());
         Notification.show("Пользователь удален");
